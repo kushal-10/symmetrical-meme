@@ -118,7 +118,7 @@ model = AutoModel.from_pretrained(
     low_cpu_mem_usage=True,
     use_flash_attn=False,
     trust_remote_code=True,
-    device_map=device_map).eval()
+    device_map="auto").eval()
 
 print(model)
 
