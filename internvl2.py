@@ -42,8 +42,8 @@ def split_model(model_name):
 
     return device_map
 
-path = "OpenGVLab/InternVL2-26B"
-device_map = split_model('InternVL2-26B')
+path = "OpenGVLab/InternVL2-40B"
+device_map = split_model('InternVL2-40B')
 model = AutoModel.from_pretrained(
     path,
     torch_dtype=torch.bfloat16,
