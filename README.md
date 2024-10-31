@@ -1,2 +1,2 @@
 # symmetrical-meme
-Inference codes for clembench 2.0
+Inference codes 2.0 for clembench 
