@@ -42,8 +42,8 @@ def split_model(model_name):
 
     return device_map
 
-path = "OpenGVLab/InternVL2-40B"
-device_map = split_model('InternVL2-40B')
+path = "OpenGVLab/InternVL2-26B"
+device_map = split_model('InternVL2-26B')
 model = AutoModel.from_pretrained(
     path,
     torch_dtype=torch.bfloat16,
@@ -136,7 +136,7 @@ generation_config = dict(max_new_tokens=1024, do_sample=True)
 
 # single-image single-round conversation (单图单轮对话)
 question = '<image>\nPlease describe the image shortly.'
-response = model.chat(tokenizer, pixel_values, question, generation_config, return_dict=True)
+response = model.chat(tokenizer, pixel_values, question, generation_config)
 print(f'User: {question}\nAssistant: {response}')
 
 # # single-image multi-round conversation (单图多轮对话)
