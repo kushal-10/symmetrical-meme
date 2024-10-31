@@ -108,8 +108,8 @@ def split_model(model_name):
 
 # If you set `load_in_8bit=True`, you will need two 80GB GPUs.
 # If you set `load_in_8bit=False`, you will need at least three 80GB GPUs.
-path = 'OpenGVLab/InternVL2-Llama3-76B'
-device_map = split_model('InternVL2-Llama3-76B')
+path = 'OpenGVLab/InternVL2-26B'
+device_map = split_model('InternVL2-26B')
 model = AutoModel.from_pretrained(
     path,
     torch_dtype=torch.bfloat16,
