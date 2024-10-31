@@ -80,51 +80,28 @@ def load_image(image_file, input_size=448, max_num=12):
     pixel_values = torch.stack(pixel_values)
     return pixel_values
 
-def split_model(model_name):
-    device_map = {}
-    world_size = torch.cuda.device_count()
-    num_layers = {
-        'InternVL2-1B': 24, 'InternVL2-2B': 24, 'InternVL2-4B': 32, 'InternVL2-8B': 32,
-        'InternVL2-26B': 48, 'InternVL2-40B': 60, 'InternVL2-Llama3-76B': 80}[model_name]
-    # Since the first GPU will be used for ViT, treat it as half a GPU.
-    num_layers_per_gpu = math.ceil(num_layers / (world_size - 0.5))
-    num_layers_per_gpu = [num_layers_per_gpu] * world_size
-    num_layers_per_gpu[0] = math.ceil(num_layers_per_gpu[0] * 0.5)
-    layer_cnt = 0
-    for i, num_layer in enumerate(num_layers_per_gpu):
-        for j in range(num_layer):
-            device_map[f'language_model.model.layers.{layer_cnt}'] = i
-            layer_cnt += 1
-    device_map['vision_model'] = 0
-    device_map['mlp1'] = 0
-    device_map['language_model.model.tok_embeddings'] = 0
-    device_map['language_model.model.embed_tokens'] = 0
-    device_map['language_model.output'] = 0
-    device_map['language_model.model.norm'] = 0
-    device_map['language_model.lm_head'] = 0
-    device_map[f'language_model.model.layers.{num_layers - 1}'] = 0
 
-    return device_map
-
-# If you set `load_in_8bit=True`, you will need two 80GB GPUs.
-# If you set `load_in_8bit=False`, you will need at least three 80GB GPUs.
-path = 'OpenGVLab/InternVL2-26B'
-device_map = split_model('InternVL2-26B')
+path = 'OpenGVLab/InternVL2-8B'
 model = AutoModel.from_pretrained(
     path,
-    torch_dtype=torch.bfloat16,
     load_in_8bit=True,
     low_cpu_mem_usage=True,
     use_flash_attn=True,
     trust_remote_code=True,
+    torch_dtype=torch.bfloat16,
     device_map="auto").eval()
 tokenizer = AutoTokenizer.from_pretrained(path, trust_remote_code=True, use_fast=False)
+
+
 
 # set the max number of tiles in `max_num`
 pixel_values = load_image('./examples/image1.jpg', max_num=12).to(torch.bfloat16).cuda()
 generation_config = dict(max_new_tokens=1024, do_sample=True)
 
-# single-image single-round conversation (单图单轮对话)
-question = '<image>\nPlease describe the image shortly.'
-response = model.chat(tokenizer, pixel_values, question, generation_config)
+# single-image multi-round conversation (单图多轮对话)
+question = '<image>\nPlease describe the image in detail.'
+response, history = model.chat(tokenizer, pixel_values, question, generation_config, history=None, return_history=True)
 print(f'User: {question}\nAssistant: {response}')
+print("-"*100)
+print(history)
+
