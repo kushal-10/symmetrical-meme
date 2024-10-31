@@ -1,0 +1,6 @@
+[
+    {
+        "model_name": "internlm-xcomposer-2.5-7b",
+        "model_class": "InternlmMLLM"
+    }
+]
