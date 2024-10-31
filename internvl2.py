@@ -95,7 +95,9 @@ tokenizer = AutoTokenizer.from_pretrained(path, trust_remote_code=True, use_fast
 
 # set the max number of tiles in `max_num`
 # pixel_values = load_image('./examples/image1.jpg', max_num=12).to(torch.bfloat16).cuda()
-pixel_values = Image.open('./examples/image1.jpg').convert('RGB').to(torch.bfloat16).cuda()
+image = Image.open('./examples/image1.jpg').convert('RGB')
+image = T.ToTensor()(image)  # Convert to tensor
+pixel_values = image.to(torch.bfloat16).cuda()  # Move to GPU
 generation_config = dict(max_new_tokens=1024, do_sample=True)
 
 
