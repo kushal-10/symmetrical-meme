@@ -117,7 +117,7 @@ model = AutoModel.from_pretrained(
     low_cpu_mem_usage=True,
     use_flash_attn=True,
     trust_remote_code=True,
-    device_map=device_map).eval()
+    device_map="auto").eval()
 tokenizer = AutoTokenizer.from_pretrained(path, trust_remote_code=True, use_fast=False)
 
 # set the max number of tiles in `max_num`
