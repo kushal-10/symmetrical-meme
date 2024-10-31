@@ -136,7 +136,7 @@ generation_config = dict(max_new_tokens=1024, do_sample=True)
 
 # single-image single-round conversation (单图单轮对话)
 question = '<image>\nPlease describe the image shortly.'
-response = model.chat(tokenizer, pixel_values, question, generation_config)
+response = model.chat(tokenizer, pixel_values, question, generation_config, return_dict=True)
 print(f'User: {question}\nAssistant: {response}')
 
 # # single-image multi-round conversation (单图多轮对话)
