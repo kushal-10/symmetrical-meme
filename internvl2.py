@@ -50,7 +50,7 @@ model = AutoModel.from_pretrained(
     low_cpu_mem_usage=True,
     use_flash_attn=True,
     trust_remote_code=True,
-    device_map="auto").eval()
+    device_map=device_map).eval()
 
 
 
