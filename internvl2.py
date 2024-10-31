@@ -42,8 +42,8 @@ def split_model(model_name):
 
     return device_map
 
-path = "OpenGVLab/InternVL2-26B"
-device_map = split_model('InternVL2-26B')
+path = "OpenGVLab/InternVL2-40B"
+device_map = split_model('InternVL2-40B')
 model = AutoModel.from_pretrained(
     path,
     torch_dtype=torch.bfloat16,
@@ -125,14 +125,6 @@ def load_image(image_file, input_size=448, max_num=12):
     pixel_values = torch.stack(pixel_values)
     return pixel_values
 
-# # If you want to load a model using multiple GPUs, please refer to the `Multiple GPUs` section.
-# path = 'OpenGVLab/InternVL2-1B'
-# model = AutoModel.from_pretrained(
-#     path,
-#     torch_dtype=torch.bfloat16,
-#     low_cpu_mem_usage=True,
-#     use_flash_attn=True,
-#     trust_remote_code=True).eval().cuda()
 
 autotokenizer_config = dict(trust_remote_code=True, use_fast=False)
 tokenizer = AutoTokenizer.from_pretrained(path, **autotokenizer_config)
