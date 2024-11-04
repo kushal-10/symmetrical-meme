@@ -46,3 +46,20 @@ print("-"*100)
 
 image_url_rendered = render_messages(image_url_messages)
 print(image_url_rendered)
+
+
+"""
+Write a jinja template to convert this into :
+multi_image_messages = [
+    {"role": "user", "content": "What is this image?", "image": "examples/image1.jpg"},
+    {"role": "assistant", "content": "Shoes a dining room table with 6 chairs"},
+    {"role": "user", "content": "What is this image?", "image": "examples/image2.jpg"},
+    {"role": "assistant", "content": "A childrens playroom with a TV and images on the walls"},
+    {"role": "user", "content": "Tell me the difference between the two images"}  
+
+    This :
+    Image-1: <image>\nWhat is this image. 
+]
+
+
+"""

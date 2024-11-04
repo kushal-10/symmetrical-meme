@@ -81,7 +81,7 @@ def load_image(image_file, input_size=448, max_num=12):
     return pixel_values
 
 
-path = 'OpenGVLab/InternVL2-8B'
+path = 'OpenGVLab/InternVL2-40B'
 model = AutoModel.from_pretrained(
     path,
     load_in_8bit=True,
