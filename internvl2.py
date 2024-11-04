@@ -107,8 +107,8 @@ def split_model(model_name):
 
 # If you set `load_in_8bit=True`, you will need two 80GB GPUs.
 # If you set `load_in_8bit=False`, you will need at least three 80GB GPUs.
-path = 'OpenGVLab/InternVL2-Llama3-76B'
-device_map = split_model('InternVL2-Llama3-76B')
+path = 'OpenGVLab/InternVL2-8B'
+device_map = split_model('InternVL2-8B')
 model = AutoModel.from_pretrained(
     path,
     torch_dtype=torch.bfloat16,
@@ -123,32 +123,47 @@ tokenizer = AutoTokenizer.from_pretrained(path, trust_remote_code=True, use_fast
 pixel_values = load_image('./examples/image1.jpg', max_num=12).to(torch.bfloat16).cuda()
 generation_config = dict(max_new_tokens=1024, do_sample=True)
 
-# single-image single-round conversation (单图单轮对话)
-question = '<image>\nPlease describe the image shortly.'
-response = model.chat(tokenizer, pixel_values, question, generation_config)
+# multi-image multi-round conversation, combined images (多图多轮对话，拼接图像)
+pixel_values1 = load_image('./examples/image1.jpg', max_num=12).to(torch.bfloat16).cuda()
+pixel_values2 = load_image('./examples/image2.jpg', max_num=12).to(torch.bfloat16).cuda()
+pixel_values = torch.cat((pixel_values1, pixel_values2), dim=0)
+
+question = '<image>\nDescribe the two images in detail.'
+response, history = model.chat(tokenizer, pixel_values, question, generation_config,
+                               history=None, return_history=True)
 print(f'User: {question}\nAssistant: {response}')
 
-# single-image multi-round conversation (单图多轮对话)
-question = '<image>\nPlease describe the image in detail.'
-response, history = model.chat(tokenizer, pixel_values, question, generation_config, history=None, return_history=True)
+print("-"*100)
+print("History: ")
+print("-"*100)
+print(history)
+
+question = 'What are the similarities and differences between these two images.'
+response, history = model.chat(tokenizer, pixel_values, question, generation_config,
+                               history=history, return_history=True)
 print(f'User: {question}\nAssistant: {response}')
 
-# question = 'Please write a poem according to the image.'
-# response, history = model.chat(tokenizer, pixel_values, question, generation_config, history=history, return_history=True)
-# print(f'User: {question}\nAssistant: {response}')
+print("-"*100)
+print("History: ")
+print("-"*100)
+print(history)
 
-# # multi-image multi-round conversation, combined images (多图多轮对话，拼接图像)
-# pixel_values1 = load_image('./examples/image1.jpg', max_num=12).to(torch.bfloat16).cuda()
-# pixel_values2 = load_image('./examples/image2.jpg', max_num=12).to(torch.bfloat16).cuda()
-# pixel_values = torch.cat((pixel_values1, pixel_values2), dim=0)
 
-# question = '<image>\nDescribe the two images in detail.'
-# response, history = model.chat(tokenizer, pixel_values, question, generation_config,
-#                                history=None, return_history=True)
-# print(f'User: {question}\nAssistant: {response}')
+# multi-image multi-round conversation, separate images (多图多轮对话，独立图像)
+pixel_values1 = load_image('./examples/image1.jpg', max_num=12).to(torch.bfloat16).cuda()
+pixel_values2 = load_image('./examples/image2.jpg', max_num=12).to(torch.bfloat16).cuda()
+pixel_values = torch.cat((pixel_values1, pixel_values2), dim=0)
+num_patches_list = [pixel_values1.size(0), pixel_values2.size(0)]
 
-# question = 'What are the similarities and differences between these two images.'
-# response, history = model.chat(tokenizer, pixel_values, question, generation_config,
-#                                history=history, return_history=True)
-# print(f'User: {question}\nAssistant: {response}')
+question = 'Image-1: <image>\nImage-2: <image>\nDescribe the two images in detail.'
+response, history = model.chat(tokenizer, pixel_values, question, generation_config,
+                               num_patches_list=num_patches_list,
+                               history=None, return_history=True)
+print(f'User: {question}\nAssistant: {response}')
+
+question = 'What are the similarities and differences between these two images.'
+response, history = model.chat(tokenizer, pixel_values, question, generation_config,
+                               num_patches_list=num_patches_list,
+                               history=history, return_history=True)
+print(f'User: {question}\nAssistant: {response}')
 
