@@ -9,14 +9,13 @@ from transformers.image_utils import load_image
 DEVICE = "cuda:0"
 
 # Note that passing the image urls (instead of the actual pil images) to the processor is also possible
-image1 = load_image("examples/image1.jpg")
 image2 = load_image("https://cdn.britannica.com/59/94459-050-DBA42467/Skyline-Chicago.jpg")
 image3 = load_image("https://cdn.britannica.com/68/170868-050-8DDE8263/Golden-Gate-Bridge-San-Francisco.jpg")
 
 processor = AutoProcessor.from_pretrained("HuggingFaceM4/Idefics3-8B-Llama3")
-# model = AutoModelForVision2Seq.from_pretrained(
-#     "HuggingFaceM4/Idefics3-8B-Llama3", torch_dtype=torch.bfloat16
-# ).to(DEVICE)
+model = AutoModelForVision2Seq.from_pretrained(
+    "HuggingFaceM4/Idefics3-8B-Llama3", torch_dtype=torch.bfloat16
+).to(DEVICE)
 
 # Create inputs
 messages = [
@@ -24,44 +23,21 @@ messages = [
         "role": "user",
         "content": [
             {"type": "image"},
-            {"type": "text", "text": "What do we see in this image?"},
-        ]
-    },
-    {
-        "role": "assistant",
-        "content": [
-            {"type": "text", "text": "In this image, we can see the city of New York, and more specifically the Statue of Liberty."},
-        ]
-    },
-    {
-        "role": "user",
-        "content": [
             {"type": "image"},
-            {"type": "text", "text": "And how about this image?"},
+            {"type": "text", "text": "What difference between these images?"},
         ]
-    },       
+    }    
 ]
 
 prompt = processor.apply_chat_template(messages, add_generation_prompt=True)
-print(prompt)
-
-single_image_messages = [
-    {"role": "user", "content": "What is this image?"},
-    {"role": "assistant", "content": "Shoes a dining room table with 6 chairs"},
-    {"role": "user", "content": "Tell me more about this image"}  
-]
-
-messages = single_image_messages
-
-prompt = processor.apply_chat_template(messages, add_generation_prompt=True)
-print(prompt)
-
-# inputs = processor(text=prompt, images=[image1], return_tensors="pt")
-# inputs = {k: v.to(DEVICE) for k, v in inputs.items()}
 
 
-# # Generate
-# generated_ids = model.generate(**inputs, max_new_tokens=500)
-# generated_texts = processor.batch_decode(generated_ids, skip_special_tokens=True)
+inputs = processor(text=prompt, images=[image2, image3], return_tensors="pt")
+inputs = {k: v.to(DEVICE) for k, v in inputs.items()}
 
-# print(generated_texts)
+
+# Generate
+generated_ids = model.generate(**inputs, max_new_tokens=500)
+generated_texts = processor.batch_decode(generated_ids, skip_special_tokens=True)
+
+print(generated_texts)
