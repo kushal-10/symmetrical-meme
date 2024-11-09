@@ -12,6 +12,8 @@ model = LlavaForConditionalGeneration.from_pretrained(
 ).to(0)
 
 processor = AutoProcessor.from_pretrained(model_id)
+processor.patch_size = 16  # Set your desired patch size
+processor.vision_feature_select_strategy = "select_strategy_name"  # Set your desired strategy
 
 # Define a chat histiry and use `apply_chat_template` to get correctly formatted prompt
 # Each value in "content" has to be a list of dicts with types ("text", "image") 
@@ -33,3 +35,15 @@ inputs = processor(images=raw_image, text=prompt, return_tensors='pt').to(0, tor
 
 output = model.generate(**inputs, max_new_tokens=200, do_sample=False)
 print(processor.decode(output[0][2:], skip_special_tokens=True))
+
+
+"""
+Sample response
+USER: <image>
+What are these? ASSISTANT:
+Expanding inputs for image tokens in LLaVa should be done in processing. Please add `patch_size` and `vision_feature_select_strategy` to the model's processing config or set directly with `processor.patch_size = {{patch_size}}` and processor.vision_feature_select_strategy = {{vision_feature_select_strategy}}`. Using processors without these attributes in the config is deprecated and will throw an error in v4.47.
+Expanding inputs for image tokens in LLaVa should be done in processing. Please add `patch_size` and `vision_feature_select_strategy` to the model's processing config or set directly with `processor.patch_size = {{patch_size}}` and processor.vision_feature_select_strategy = {{vision_feature_select_strategy}}`. Using processors without these attributes in the config is deprecated and will throw an error in v4.47.
+ER:
+What are these? ASSISTANT: These are two cats lying on a pink couch.
+
+"""
