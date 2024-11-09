@@ -63,3 +63,9 @@ multi_image_messages = [
 
 
 """
+
+from transformers import AutoTokenizer, AutoProcessor
+
+model_name = "llava-hf/llava-1.5-7b-hf"
+
+tk = AutoTokenizer.from_pretrained(model_name)
