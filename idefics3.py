@@ -41,6 +41,15 @@ messages = [
         ]
     },       
 ]
+
+single_image_messages = [
+    {"role": "user", "content": "What is this image?", "image": "examples/image1.jpg"},
+    {"role": "assistant", "content": "Shoes a dining room table with 6 chairs"},
+    {"role": "user", "content": "Tell me more about this image"}  
+]
+
+messages = single_image_messages
+    
 prompt = processor.apply_chat_template(messages, add_generation_prompt=True)
 inputs = processor(text=prompt, images=[image1, image2], return_tensors="pt")
 inputs = {k: v.to(DEVICE) for k, v in inputs.items()}
