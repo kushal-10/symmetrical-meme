@@ -12,10 +12,12 @@ model = LlavaForConditionalGeneration.from_pretrained(
 ).to(0)
 
 processor = AutoProcessor.from_pretrained(model_id)
-processor.patch_size = 16  # Set your desired patch size
-processor.vision_feature_select_strategy = "select_strategy_name"  # Set your desired strategy
+if not processor.patch_size:
+    processor.patch_size = 14 # Ref - https://huggingface.co/llava-hf/llava-onevision-qwen2-7b-si-hf/blob/main/config.json
+if not processor.vision_feature_select_strategy:
+    processor.vision_feature_select_strategy = "full"  # Ref - https://huggingface.co/llava-hf/llava-onevision-qwen2-7b-si-hf/blob/main/processor_config.json
 
-# Define a chat histiry and use `apply_chat_template` to get correctly formatted prompt
+# Define a chat history and use `apply_chat_template` to get correctly formatted prompt
 # Each value in "content" has to be a list of dicts with types ("text", "image") 
 conversation = [
     {
