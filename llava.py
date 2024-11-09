@@ -12,10 +12,6 @@ model = LlavaForConditionalGeneration.from_pretrained(
 ).to(0)
 
 processor = AutoProcessor.from_pretrained(model_id)
-if not processor.patch_size:
-    processor.patch_size = 14 # Ref - https://huggingface.co/llava-hf/llava-onevision-qwen2-7b-si-hf/blob/main/config.json
-if not processor.vision_feature_select_strategy:
-    processor.vision_feature_select_strategy = "full"  # Ref - https://huggingface.co/llava-hf/llava-onevision-qwen2-7b-si-hf/blob/main/processor_config.json
 
 
 # Define a chat histiry and use `apply_chat_template` to get correctly formatted prompt
