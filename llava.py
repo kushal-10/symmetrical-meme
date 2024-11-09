@@ -28,11 +28,17 @@ conversation = [
     },
 ]
 prompt = processor.apply_chat_template(conversation, add_generation_prompt=True)
-print(prompt)
+
 image_file = "http://images.cocodataset.org/val2017/000000039769.jpg"
 raw_image = Image.open(requests.get(image_file, stream=True).raw)
-inputs = processor(images=raw_image, text=prompt, return_tensors='pt').to(0, torch.float16)
 
+# Ensure the image is processed correctly
+raw_image = Image.open(requests.get(image_file, stream=True).raw)
+
+# Check if the processor is set up correctly
+inputs = processor(images=[raw_image], text=prompt, return_tensors='pt').to(0, torch.float16)  # Wrap raw_image in a list
+
+# Ensure the model receives the correct number of images
 output = model.generate(**inputs, max_new_tokens=200, do_sample=False)
 print(processor.decode(output[0][2:], skip_special_tokens=True))
 
