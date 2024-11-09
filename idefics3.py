@@ -14,9 +14,9 @@ image2 = load_image("https://cdn.britannica.com/59/94459-050-DBA42467/Skyline-Ch
 image3 = load_image("https://cdn.britannica.com/68/170868-050-8DDE8263/Golden-Gate-Bridge-San-Francisco.jpg")
 
 processor = AutoProcessor.from_pretrained("HuggingFaceM4/Idefics3-8B-Llama3")
-model = AutoModelForVision2Seq.from_pretrained(
-    "HuggingFaceM4/Idefics3-8B-Llama3", torch_dtype=torch.bfloat16
-).to(DEVICE)
+# model = AutoModelForVision2Seq.from_pretrained(
+#     "HuggingFaceM4/Idefics3-8B-Llama3", torch_dtype=torch.bfloat16
+# ).to(DEVICE)
 
 # Create inputs
 messages = [
@@ -56,12 +56,12 @@ messages = single_image_messages
 prompt = processor.apply_chat_template(messages, add_generation_prompt=True)
 print(prompt)
 
-inputs = processor(text=prompt, images=[image1], return_tensors="pt")
-inputs = {k: v.to(DEVICE) for k, v in inputs.items()}
+# inputs = processor(text=prompt, images=[image1], return_tensors="pt")
+# inputs = {k: v.to(DEVICE) for k, v in inputs.items()}
 
 
-# Generate
-generated_ids = model.generate(**inputs, max_new_tokens=500)
-generated_texts = processor.batch_decode(generated_ids, skip_special_tokens=True)
+# # Generate
+# generated_ids = model.generate(**inputs, max_new_tokens=500)
+# generated_texts = processor.batch_decode(generated_ids, skip_special_tokens=True)
 
-print(generated_texts)
+# print(generated_texts)
