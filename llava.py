@@ -25,7 +25,7 @@ conversation = [
         ],
     },
 ]
-prompt = processor.apply_chat_template(conversation, add_generation_prompt=True)
+prompt = processor.tokenizer.apply_chat_template(conversation, add_generation_prompt=True)
 
 image_file = "http://images.cocodataset.org/val2017/000000039769.jpg"
 raw_image = Image.open(requests.get(image_file, stream=True).raw)
