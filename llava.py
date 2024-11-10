@@ -3,7 +3,7 @@
 
 # import torch
 # from transformers import AutoProcessor, LlavaForConditionalGeneration
-# from jinja2 import Template
+from jinja2 import Template
 
 # model_id = "llava-hf/llava-1.5-7b-hf"
 # model = LlavaForConditionalGeneration.from_pretrained(
@@ -68,9 +68,17 @@ conversation = [
         ],
     },
 ]
-prompt = processor.apply_chat_template(conversation, add_generation_prompt=True)
 
-inputs = processor(images=image, text=prompt, return_tensors="pt").to("cuda:0")
+# Define the Jinja2 template for formatting the conversation
+chat_template = Template("{% for message in messages %}{{ message['role'].capitalize() + ': ' + (message['content'][0]['text'] if message['content'] else '') + '\\n' }}{% endfor %}Assistant: ")
+
+# Use the template to format the conversation
+formatted_prompt = chat_template.render(messages=conversation)
+
+# prompt = processor.apply_chat_template(conversation, add_generation_prompt=True)
+
+# inputs = processor(images=image, text=prompt, return_tensors="pt").to("cuda:0")
+inputs = processor.tokenizer(text=formatted_prompt, return_tensors="pt").to("cuda:0")
 
 # autoregressively complete prompt
 output = model.generate(**inputs, max_new_tokens=100)
