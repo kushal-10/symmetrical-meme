@@ -7,7 +7,7 @@ from transformers import AutoProcessor, LlavaOnevisionForConditionalGeneration
 model_id = "llava-hf/llava-onevision-qwen2-7b-ov-chat-hf"
 model = LlavaOnevisionForConditionalGeneration.from_pretrained(
     model_id, 
-    torch_dtype=torch.float16, 
+    torch_dtype="auto", 
     low_cpu_mem_usage=True, 
 ).to(0)
 
