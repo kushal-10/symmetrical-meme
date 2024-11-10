@@ -47,9 +47,9 @@ import torch
 from PIL import Image
 import requests
 
-processor = LlavaNextProcessor.from_pretrained("llava-v1.6-vicuna-7b-hf")
+processor = LlavaNextProcessor.from_pretrained("llava-hf/llava-v1.6-vicuna-7b-hf")
 
-model = LlavaNextForConditionalGeneration.from_pretrained("llava-v1.6-vicuna-7b-hf", torch_dtype=torch.float16, low_cpu_mem_usage=True) 
+model = LlavaNextForConditionalGeneration.from_pretrained("llava-hf/llava-v1.6-vicuna-7b-hf", torch_dtype=torch.float16, low_cpu_mem_usage=True) 
 model.to("cuda:0")
 
 # prepare image and text prompt, using the appropriate prompt template
