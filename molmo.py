@@ -18,10 +18,15 @@ model = AutoModelForCausalLM.from_pretrained(
     device_map='auto'
 )
 
+# # process the image and text
+# inputs = processor.process(
+#     images=[Image.open(requests.get("https://picsum.photos/id/237/536/354", stream=True).raw)],
+#     text="Describe this image."
+# )
+
 # process the image and text
 inputs = processor.process(
-    images=[Image.open(requests.get("https://picsum.photos/id/237/536/354", stream=True).raw)],
-    text="Describe this image."
+    text="What is the capital of france?"
 )
 
 # move inputs to the correct device and make a batch of size 1
@@ -40,6 +45,3 @@ generated_text = processor.tokenizer.decode(generated_tokens, skip_special_token
 
 # print the generated text
 print(generated_text)
-
-# >>>  This image features an adorable black Labrador puppy, captured from a top-down
-#      perspective. The puppy is sitting on a wooden deck, which is composed ...
