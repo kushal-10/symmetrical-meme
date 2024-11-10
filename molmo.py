@@ -24,11 +24,6 @@ inputs = processor.process(
     text="User: Explain the first IMage. Assitant: This image captures a young black Labrador puppy, likely around six months old, sitting on a weathered wooden deck. The puppy's sleek, short fur is entirely black, including its nose, eyes, and ears, which are slightly floppy. The dog is positioned in the center of the frame, looking up directly at the camera with a curious and attentive expression. Its front paws are visible, with one slightly tucked under its body, while its back paws are hidden from view. User: Tell me more "
 )
 
-# process the image and text
-inputs = processor.process(
-    text="What is the capital of france?"
-)
-
 # move inputs to the correct device and make a batch of size 1
 inputs = {k: v.to(model.device).unsqueeze(0) for k, v in inputs.items()}
 
