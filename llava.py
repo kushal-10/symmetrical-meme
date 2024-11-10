@@ -26,6 +26,20 @@ conversation = [
     },
 ]
 
+conversation = [
+    {
+
+      "role": "user",
+      "content": "What is the capital of France?"
+    },
+]
+
+
+# def clean_messages(messages):
+#     for msg in messages:
+#         if len(msg['content']) == 1:
+
+
 processor.tokenizer.chat_template = "{% if not add_generation_prompt is defined %}{% set add_generation_prompt = false %}{% endif %}{% for message in messages %}{{'<|im_start|>' + message['role'] + '\n' + message['content'][0]['text'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}"
 prompt = processor.tokenizer.apply_chat_template(conversation, add_generation_prompt=True)
 
