@@ -1,10 +1,15 @@
 from jinja2 import Template
 
 # Define the Jinja template for messages
-message_template =  Template("{% for message in messages %}{% if message['role'] == 'user' %}{% if message['image'] %}{% if loop.index > 1 %}Image-{{ loop.index }}: {{ message['image'] }}\n{% else %}USER:<image>\n{{ message['content'] }}{% endif %}{% else %}USER:\n{{ message['content'] }}{% endif %}{% elif message['role'] == 'assistant' %}ASSISTANT:{{ message['content'] }}{% endif %}{% endfor %}{% if messages|selectattr('image')|list|length > 1 %}Describe the two images in detail.{% endif %}ASSISTANT:")
-      
-def render_messages(messages):
-    return message_template.render(messages=messages)
+# message_template =  Template("{% for message in messages %}{% if message['role'] == 'user' %}{% if message['image'] %}{% if loop.index > 1 %}Image-{{ loop.index }}: {{ message['image'] }}\n{% else %}USER:<image>\n{{ message['content'] }}{% endif %}{% else %}USER:\n{{ message['content'] }}{% endif %}{% elif message['role'] == 'assistant' %}ASSISTANT:{{ message['content'] }}{% endif %}{% endfor %}{% if messages|selectattr('image')|list|length > 1 %}Describe the two images in detail.{% endif %}ASSISTANT:")
+olmo_template =  "{% for message in messages %}\n{% if message['role'] == 'user' %}\n{{ '<|user|>\n' + message['content'] }}\n{% elif message['role'] == 'assistant' %}\n{{ '<|assistant|>\n'  + message['content']}}\n{% endif %}\n{% if loop.last and add_generation_prompt %}\n{{ '<|assistant|>' }}\n{% endif %}\n{% endfor %}"
+
+message_template = olmo_template
+
+message_template = Template(olmo_template)  # Create a Template object
+
+def render_messages(messages, eos_token=""):
+    return message_template.render(messages=messages, eos_token=eos_token, add_generation_prompt=True)
 
 
 text_only_messages = [
@@ -46,26 +51,3 @@ print("-"*100)
 
 image_url_rendered = render_messages(image_url_messages)
 print(image_url_rendered)
-
-
-"""
-Write a jinja template to convert this into :
-multi_image_messages = [
-    {"role": "user", "content": "What is this image?", "image": "examples/image1.jpg"},
-    {"role": "assistant", "content": "Shoes a dining room table with 6 chairs"},
-    {"role": "user", "content": "What is this image?", "image": "examples/image2.jpg"},
-    {"role": "assistant", "content": "A childrens playroom with a TV and images on the walls"},
-    {"role": "user", "content": "Tell me the difference between the two images"}  
-
-    This :
-    Image-1: <image>\nWhat is this image. 
-]
-
-
-"""
-
-from transformers import AutoTokenizer, AutoProcessor
-
-model_name = "llava-hf/llava-1.5-7b-hf"
-
-tk = AutoTokenizer.from_pretrained(model_name)
