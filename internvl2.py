@@ -130,17 +130,16 @@ tokenizer = AutoTokenizer.from_pretrained(path, trust_remote_code=True, use_fast
 pixel_values1 = load_image('./examples/image1.jpg', max_num=12).to(torch.bfloat16).cuda()
 pixel_values2 = load_image('./examples/image2.jpg', max_num=12).to(torch.bfloat16).cuda()
 pixel_values3 = load_image('./examples/image3.jpg', max_num=12).to(torch.bfloat16).cuda()
-pixel_values4 = load_image('./examples/image4.jpg', max_num=12).to(torch.bfloat16).cuda()
-pixel_values = torch.cat((pixel_values1, pixel_values2, pixel_values3, pixel_values4), dim=0)
+# pixel_values4 = load_image('./examples/image4.jpg', max_num=12).to(torch.bfloat16).cuda()
+# pixel_values = torch.cat((pixel_values1, pixel_values2, pixel_values3, pixel_values4), dim=0)
 
-question = '<image>\nDescribe the 4 images in detail.'
+pixel_values = torch.cat((pixel_values1, pixel_values2, pixel_values3), dim=0)
+
+# question = '<image>\nDescribe the 4 images in detail.'
+question = '<image>\nDescribe the 3 images in detail.'
 generation_config = dict(max_new_tokens=1024, do_sample=True)
 
 response, history = model.chat(tokenizer, pixel_values, question, generation_config,
                                history=None, return_history=True)
 print(f'User: {question}\nAssistant: {response}')
 
-question = 'Explain more about these images.'
-response, history = model.chat(tokenizer, None, question, generation_config,
-                               history=history, return_history=True)
-print(f'User: {question}\nAssistant: {response}')
