@@ -1,11 +1,11 @@
 import math
+import numpy as np
 import torch
 import torchvision.transforms as T
+from decord import VideoReader, cpu
 from PIL import Image
 from torchvision.transforms.functional import InterpolationMode
 from transformers import AutoModel, AutoTokenizer
-import requests
-from io import BytesIO
 
 IMAGENET_MEAN = (0.485, 0.456, 0.406)
 IMAGENET_STD = (0.229, 0.224, 0.225)
@@ -74,12 +74,7 @@ def dynamic_preprocess(image, min_num=1, max_num=12, image_size=448, use_thumbna
     return processed_images
 
 def load_image(image_file, input_size=448, max_num=12):
-    if image_file.startswith("http"):
-        response = requests.get(image_file)
-        image = Image.open(BytesIO(response.content)).convert('RGB')
-    else:
-        image = Image.open(image_file).convert('RGB')
-
+    image = Image.open(image_file).convert('RGB')
     transform = build_transform(input_size=input_size)
     images = dynamic_preprocess(image, image_size=input_size, use_thumbnail=True, max_num=max_num)
     pixel_values = [transform(image) for image in images]
@@ -112,10 +107,10 @@ def split_model(model_name):
 
     return device_map
 
-# If you set `load_in_8bit=True`, you will need two 80GB GPUs.
-# If you set `load_in_8bit=False`, you will need at least three 80GB GPUs.
-path = 'OpenGVLab/InternVL2-8B'
-device_map = split_model('InternVL2-8B')
+# If you set `load_in_8bit=True`, you will need one 80GB GPUs.
+# If you set `load_in_8bit=False`, you will need at least two 80GB GPUs.
+path = 'OpenGVLab/InternVL2-40B'
+device_map = split_model('InternVL2-40B')
 model = AutoModel.from_pretrained(
     path,
     torch_dtype=torch.bfloat16,
@@ -127,19 +122,28 @@ model = AutoModel.from_pretrained(
 tokenizer = AutoTokenizer.from_pretrained(path, trust_remote_code=True, use_fast=False)
 
 # set the max number of tiles in `max_num`
+pixel_values = load_image('./examples/image1.jpg', max_num=12).to(torch.bfloat16).cuda()
+generation_config = dict(max_new_tokens=1024, do_sample=True)
+
+
+# single-image single-round conversation (单图单轮对话)
+question = '<image>\nPlease describe the image shortly.'
+response = model.chat(tokenizer, pixel_values, question, generation_config)
+print(f'User: {question}\nAssistant: {response}')
+
+
+
+
+# set the max number of tiles in `max_num`
 pixel_values1 = load_image('./examples/image1.jpg', max_num=12).to(torch.bfloat16).cuda()
 pixel_values2 = load_image('./examples/image2.jpg', max_num=12).to(torch.bfloat16).cuda()
 pixel_values3 = load_image('./examples/image3.jpg', max_num=12).to(torch.bfloat16).cuda()
-# pixel_values4 = load_image('./examples/image4.jpg', max_num=12).to(torch.bfloat16).cuda()
-# pixel_values = torch.cat((pixel_values1, pixel_values2, pixel_values3, pixel_values4), dim=0)
+pixel_values4 = load_image('./examples/image4.jpg', max_num=12).to(torch.bfloat16).cuda()
+pixel_values = torch.cat((pixel_values1, pixel_values2, pixel_values3, pixel_values4), dim=0)
 
-pixel_values = torch.cat((pixel_values1, pixel_values2, pixel_values3), dim=0)
+# pixel_values = torch.cat((pixel_values1, pixel_values2, pixel_values3), dim=0)
 
-# question = '<image>\nDescribe the 4 images in detail.'
-question = '<image>\nDescribe the 3 images in detail.'
+question = '<image>\nDescribe the 4 images in short.'
+# question = '<image>\nDescribe the 3 images in detail.'
 generation_config = dict(max_new_tokens=1024, do_sample=True)
-
-response, history = model.chat(tokenizer, pixel_values, question, generation_config,
-                               history=None, return_history=True)
-print(f'User: {question}\nAssistant: {response}')
 
